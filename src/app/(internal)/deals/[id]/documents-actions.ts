@@ -5,10 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { PREVIEW_MODE } from "@/lib/preview/flag";
 import { previewStore } from "@/lib/preview/store";
-import { DOCUMENTS_BUCKET } from "@/lib/documents";
+import { DOCUMENTS_BUCKET, saveDealFile } from "@/lib/documents";
 import {
   ALL_DOCUMENT_CATEGORIES,
-  MAX_UPLOAD_BYTES,
   type DocumentCategory,
 } from "@/lib/constants";
 
@@ -19,10 +18,6 @@ function categoryOf(form: FormData): DocumentCategory {
   return ALL_DOCUMENT_CATEGORIES.includes(v as DocumentCategory)
     ? (v as DocumentCategory)
     : "other";
-}
-
-function safeName(name: string): string {
-  return name.replace(/[^\w.\-]+/g, "_").slice(0, 120);
 }
 
 // ---- ファイルアップロード -----------------------------------
@@ -39,61 +34,16 @@ export async function uploadDocument(
   if (!(file instanceof File) || file.size === 0) {
     return { error: "ファイルを選択してください。", ok: false };
   }
-  if (file.size > MAX_UPLOAD_BYTES) {
-    return {
-      error:
-        "ファイルが大きすぎます（上限25MB）。重い資料はGoogleドライブのURLで登録してください。",
-      ok: false,
-    };
-  }
 
-  const category = categoryOf(form);
-  const displayName = String(form.get("name") ?? "").trim() || file.name;
-
-  if (PREVIEW_MODE) {
-    const buf = Buffer.from(await file.arrayBuffer());
-    const dataUrl = `data:${file.type || "application/octet-stream"};base64,${buf.toString("base64")}`;
-    previewStore.addFile(dealId, {
-      category,
-      name: displayName,
-      mime: file.type || null,
-      size: file.size,
-      dataUrl,
-    });
-    revalidatePath(`/deals/${dealId}`);
-    return { error: null, ok: true };
-  }
-
-  const supabase = await createClient();
-  const path = `${dealId}/${Date.now()}-${safeName(file.name)}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from(DOCUMENTS_BUCKET)
-    .upload(path, file, {
-      contentType: file.type || undefined,
-      upsert: false,
-    });
-
-  if (uploadError) {
-    return { error: `アップロードに失敗しました：${uploadError.message}`, ok: false };
-  }
-
-  const { error: insertError } = await supabase.from("deal_documents").insert({
-    deal_id: dealId,
-    category,
-    kind: "file",
-    name: displayName,
-    file_path: path,
-    mime_type: file.type || null,
-    size_bytes: file.size,
-    uploaded_by: user.authId,
+  const { error } = await saveDealFile({
+    dealId,
+    file,
+    category: categoryOf(form),
+    displayName: String(form.get("name") ?? ""),
+    uploadedBy: user.authId,
   });
 
-  if (insertError) {
-    // 行作成に失敗したらアップロード済みファイルを片付ける
-    await supabase.storage.from(DOCUMENTS_BUCKET).remove([path]);
-    return { error: `登録に失敗しました：${insertError.message}`, ok: false };
-  }
+  if (error) return { error, ok: false };
 
   revalidatePath(`/deals/${dealId}`);
   return { error: null, ok: true };

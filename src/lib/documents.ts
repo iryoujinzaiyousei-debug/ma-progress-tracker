@@ -2,10 +2,82 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { PREVIEW_MODE } from "@/lib/preview/flag";
 import { previewStore } from "@/lib/preview/store";
-import type { DocumentCategory } from "@/lib/constants";
+import { MAX_UPLOAD_BYTES, type DocumentCategory } from "@/lib/constants";
 
 export const DOCUMENTS_BUCKET = "deal-documents";
 const SIGNED_URL_TTL = 60 * 60; // 1時間
+
+function safeName(name: string): string {
+  return name.replace(/[^\w.\-]+/g, "_").slice(0, 120);
+}
+
+/**
+ * 1ファイルを Storage に保存し deal_documents に登録する（本番）。
+ * プレビュー時は data URL にして previewStore へ追加する。
+ * uploadDocument（書類パネル）と createDeal（新規登録時の概要書）で共用。
+ * revalidatePath は呼び出し側で行う。
+ */
+export async function saveDealFile(params: {
+  dealId: string;
+  file: File;
+  category: DocumentCategory;
+  displayName?: string | null;
+  uploadedBy: string;
+}): Promise<{ error: string | null }> {
+  const { dealId, file, category, uploadedBy } = params;
+  const displayName = (params.displayName ?? "").trim() || file.name;
+
+  if (file.size === 0) return { error: "ファイルを選択してください。" };
+  if (file.size > MAX_UPLOAD_BYTES) {
+    return {
+      error:
+        "ファイルが大きすぎます（上限25MB）。重い資料はGoogleドライブのURLで登録してください。",
+    };
+  }
+
+  if (PREVIEW_MODE) {
+    const buf = Buffer.from(await file.arrayBuffer());
+    const dataUrl = `data:${file.type || "application/octet-stream"};base64,${buf.toString("base64")}`;
+    previewStore.addFile(dealId, {
+      category,
+      name: displayName,
+      mime: file.type || null,
+      size: file.size,
+      dataUrl,
+    });
+    return { error: null };
+  }
+
+  const supabase = await createClient();
+  const path = `${dealId}/${Date.now()}-${safeName(file.name)}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from(DOCUMENTS_BUCKET)
+    .upload(path, file, { contentType: file.type || undefined, upsert: false });
+
+  if (uploadError) {
+    return { error: `アップロードに失敗しました：${uploadError.message}` };
+  }
+
+  const { error: insertError } = await supabase.from("deal_documents").insert({
+    deal_id: dealId,
+    category,
+    kind: "file",
+    name: displayName,
+    file_path: path,
+    mime_type: file.type || null,
+    size_bytes: file.size,
+    uploaded_by: uploadedBy,
+  });
+
+  if (insertError) {
+    // 行作成に失敗したらアップロード済みファイルを片付ける
+    await supabase.storage.from(DOCUMENTS_BUCKET).remove([path]);
+    return { error: `登録に失敗しました：${insertError.message}` };
+  }
+
+  return { error: null };
+}
 
 /** UI が扱う、プレビューURLを解決済みの書類型 */
 export type DealDocument = {

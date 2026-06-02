@@ -159,6 +159,35 @@ export function DealForm({
         )}
       </Section>
 
+      {/* 概要書（新規登録時のみ。編集時は詳細画面の概要書セクションから操作） */}
+      {!deal && (
+        <Section
+          title="概要書（任意）"
+          description="案件概要書のPDFを登録できます。あとから詳細画面でも追加・差し替えできます。"
+        >
+          <div className="space-y-1.5">
+            <Label htmlFor="summary_name">表示名（任意）</Label>
+            <Input
+              id="summary_name"
+              name="summary_name"
+              placeholder="未入力ならファイル名を使用（例：案件概要書）"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="summary_file">概要書PDF（上限25MB）</Label>
+            <Input
+              id="summary_file"
+              name="summary_file"
+              type="file"
+              accept="application/pdf,.pdf"
+            />
+            <p className="text-xs text-slate-400">
+              重いファイルはアップロードに失敗することがあります。その場合は作成後に詳細画面から登録してください。
+            </p>
+          </div>
+        </Section>
+      )}
+
       {/* 商流 */}
       <Section
         title="商流"

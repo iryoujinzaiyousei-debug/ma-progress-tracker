@@ -6,8 +6,14 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { PREVIEW_MODE } from "@/lib/preview/flag";
 import { previewStore } from "@/lib/preview/store";
-import { STATUS_ORDER, DEAL_TYPE_ORDER } from "@/lib/constants";
+import {
+  STATUS_ORDER,
+  DEAL_TYPE_ORDER,
+  SUMMARY_CATEGORY,
+  MAX_UPLOAD_BYTES,
+} from "@/lib/constants";
 import type { DealStatus, DealType } from "@/lib/constants";
+import { saveDealFile } from "@/lib/documents";
 import type { DealInsert, DealUpdate } from "@/lib/types";
 
 export type DealFormState = { error: string | null };
@@ -98,12 +104,33 @@ export async function createDeal(
   const assigneeIds = form.getAll("assignee_ids").map(String);
   const primaryId = str(form, "primary_assignee_id");
 
+  // 概要書（任意）。案件作成前にサイズだけ検証し、上限超過なら作成自体を止める。
+  const summaryRaw = form.get("summary_file");
+  const summaryFile =
+    summaryRaw instanceof File && summaryRaw.size > 0 ? summaryRaw : null;
+  if (summaryFile && summaryFile.size > MAX_UPLOAD_BYTES) {
+    return {
+      error:
+        "概要書ファイルが大きすぎます（上限25MB）。案件作成後に詳細画面からアップロードしてください。",
+    };
+  }
+  const summaryName = str(form, "summary_name");
+
   if (PREVIEW_MODE) {
     const id = previewStore.create(
       { ...fields, deal_name: fields.deal_name, created_by: user.authId },
       assigneeIds,
       primaryId,
     );
+    if (summaryFile) {
+      await saveDealFile({
+        dealId: id,
+        file: summaryFile,
+        category: SUMMARY_CATEGORY,
+        displayName: summaryName,
+        uploadedBy: user.authId,
+      });
+    }
     revalidatePath("/deals");
     revalidatePath("/dashboard");
     redirect(`/deals/${id}`);
@@ -127,6 +154,23 @@ export async function createDeal(
   }
 
   await replaceAssignees(supabase, data.id, assigneeIds, primaryId);
+
+  // 概要書は案件作成後に保存。失敗しても案件作成は確定済みなので、
+  // サーバーログに残しつつ詳細画面へ進む（詳細画面から再アップロード可能）。
+  if (summaryFile) {
+    const { error: summaryError } = await saveDealFile({
+      dealId: data.id,
+      file: summaryFile,
+      category: SUMMARY_CATEGORY,
+      displayName: summaryName,
+      uploadedBy: user.authId,
+    });
+    if (summaryError) {
+      console.error(
+        `概要書の保存に失敗しました（案件は作成済み deal=${data.id}）：${summaryError}`,
+      );
+    }
+  }
 
   revalidatePath("/deals");
   revalidatePath("/dashboard");
