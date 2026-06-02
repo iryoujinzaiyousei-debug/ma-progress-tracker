@@ -5,6 +5,7 @@
 
 -- 書類カテゴリ
 create type document_category as enum (
+  'summary',    -- 概要書（案件概要書・ノンネーム等。商流上部に表示する主要資料）
   'materials',  -- 受領資料
   'contract',   -- 契約書類
   'financial',  -- 財務資料

@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDealById, getDealHistory } from "@/lib/deals";
 import { getDealDocuments } from "@/lib/documents";
+import { SUMMARY_CATEGORY } from "@/lib/constants";
 import { DocumentsPanel } from "@/components/deals/documents-panel";
+import { SummaryPanel } from "@/components/deals/summary-panel";
 import { StatusBadge } from "@/components/deals/status-badge";
 import { DealProgressBar } from "@/components/deals/deal-progress-bar";
 import { TypeBadge } from "@/components/deals/type-badge";
@@ -73,6 +75,8 @@ export default async function DealDetailPage({
   if (!deal) notFound();
 
   const primary = deal.assignees.find((a) => a.is_primary);
+  const summaryDocs = documents.filter((d) => d.category === SUMMARY_CATEGORY);
+  const otherDocs = documents.filter((d) => d.category !== SUMMARY_CATEGORY);
 
   return (
     <div className="mx-auto max-w-5xl space-y-5">
@@ -113,6 +117,11 @@ export default async function DealDetailPage({
 
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="space-y-5 lg:col-span-2">
+          {/* 概要書（商流の上） */}
+          <Panel title="概要書">
+            <SummaryPanel dealId={deal.id} documents={summaryDocs} />
+          </Panel>
+
           {/* 商流 */}
           <Panel title="商流">
             <FlowDiagram
@@ -180,7 +189,7 @@ export default async function DealDetailPage({
 
           {/* 資料・書類 */}
           <Panel title="資料・書類">
-            <DocumentsPanel dealId={deal.id} documents={documents} />
+            <DocumentsPanel dealId={deal.id} documents={otherDocs} />
           </Panel>
 
           {/* 進捗履歴 */}

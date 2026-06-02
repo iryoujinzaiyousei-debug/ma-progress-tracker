@@ -276,7 +276,12 @@ export type Database = {
         | "lost"
         | "on_hold";
       user_role: "admin" | "staff";
-      document_category: "materials" | "contract" | "financial" | "other";
+      document_category:
+        | "summary"
+        | "materials"
+        | "contract"
+        | "financial"
+        | "other";
       buyer_status: "active" | "paused" | "closed";
     };
     CompositeTypes: Record<never, never>;

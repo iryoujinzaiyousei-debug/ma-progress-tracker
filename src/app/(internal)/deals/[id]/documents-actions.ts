@@ -7,7 +7,7 @@ import { PREVIEW_MODE } from "@/lib/preview/flag";
 import { previewStore } from "@/lib/preview/store";
 import { DOCUMENTS_BUCKET } from "@/lib/documents";
 import {
-  DOCUMENT_CATEGORY_ORDER,
+  ALL_DOCUMENT_CATEGORIES,
   MAX_UPLOAD_BYTES,
   type DocumentCategory,
 } from "@/lib/constants";
@@ -16,7 +16,7 @@ export type DocFormState = { error: string | null; ok: boolean };
 
 function categoryOf(form: FormData): DocumentCategory {
   const v = String(form.get("category") ?? "other");
-  return DOCUMENT_CATEGORY_ORDER.includes(v as DocumentCategory)
+  return ALL_DOCUMENT_CATEGORIES.includes(v as DocumentCategory)
     ? (v as DocumentCategory)
     : "other";
 }

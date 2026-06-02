@@ -169,6 +169,13 @@ export const STATUS_CHECKLIST: Partial<Record<DealStatus, string[]>> = {
 // 資料・書類（案件詳細の添付ファイル / 外部URLリンク）
 // ============================================
 
+/**
+ * 概要書カテゴリ。商流の上部に専用セクションで表示する主要資料（案件概要書・ノンネーム等）。
+ * 一般の「資料・書類」一覧（DOCUMENT_CATEGORY_ORDER）とは分けて扱う。
+ */
+export const SUMMARY_CATEGORY: DocumentCategory = "summary";
+
+/** 一般の「資料・書類」一覧で表示・選択できるカテゴリ（概要書は含めない） */
 export const DOCUMENT_CATEGORY_ORDER: DocumentCategory[] = [
   "materials",
   "contract",
@@ -176,7 +183,14 @@ export const DOCUMENT_CATEGORY_ORDER: DocumentCategory[] = [
   "other",
 ];
 
+/** バリデーション用：enum の全カテゴリ（概要書を含む） */
+export const ALL_DOCUMENT_CATEGORIES: DocumentCategory[] = [
+  SUMMARY_CATEGORY,
+  ...DOCUMENT_CATEGORY_ORDER,
+];
+
 export const DOCUMENT_CATEGORY_LABEL: Record<DocumentCategory, string> = {
+  summary: "概要書",
   materials: "受領資料",
   contract: "契約書類",
   financial: "財務資料",
@@ -184,6 +198,7 @@ export const DOCUMENT_CATEGORY_LABEL: Record<DocumentCategory, string> = {
 };
 
 export const DOCUMENT_CATEGORY_COLOR: Record<DocumentCategory, string> = {
+  summary: "bg-amber-100 text-amber-700 border-amber-200",
   materials: "bg-sky-100 text-sky-700 border-sky-200",
   contract: "bg-violet-100 text-violet-700 border-violet-200",
   financial: "bg-emerald-100 text-emerald-700 border-emerald-200",
