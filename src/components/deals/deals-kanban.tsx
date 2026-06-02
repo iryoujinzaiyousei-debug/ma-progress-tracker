@@ -53,6 +53,15 @@ function Card({ deal }: { deal: DealWithAssignees }) {
           {deal.deal_name}
         </p>
       </div>
+      {(deal.seller_company || deal.buyer_company) && (
+        <p className="mb-1.5 truncate text-xs text-slate-500">
+          <span className="text-slate-400">売</span>{" "}
+          {deal.seller_company ?? "—"}
+          <span className="mx-1 text-slate-300">→</span>
+          <span className="text-slate-400">買</span>{" "}
+          {deal.buyer_company ?? "—"}
+        </p>
+      )}
       <TypeBadge type={deal.deal_type} />
       <WarningBadges deal={deal} className="mt-2" />
       <div className="mt-2 flex items-center justify-between text-xs text-slate-500">

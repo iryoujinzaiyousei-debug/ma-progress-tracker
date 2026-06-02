@@ -38,6 +38,8 @@ export function DealsTable({ deals }: { deals: DealWithAssignees[] }) {
           <TableRow className="bg-slate-50">
             <TableHead className="min-w-48">案件名</TableHead>
             <TableHead>種別</TableHead>
+            <TableHead>売主</TableHead>
+            <TableHead>買主</TableHead>
             <TableHead>ステータス</TableHead>
             <TableHead>担当</TableHead>
             <TableHead className="text-right">譲渡価格</TableHead>
@@ -68,6 +70,16 @@ export function DealsTable({ deals }: { deals: DealWithAssignees[] }) {
                 </TableCell>
                 <TableCell>
                   <TypeBadge type={deal.deal_type} />
+                </TableCell>
+                <TableCell className="max-w-40 truncate text-sm text-slate-600">
+                  {deal.seller_company ?? (
+                    <span className="text-slate-400">—</span>
+                  )}
+                </TableCell>
+                <TableCell className="max-w-40 truncate text-sm text-slate-600">
+                  {deal.buyer_company ?? (
+                    <span className="text-slate-400">—</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={deal.current_status} />
