@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { logoutAction } from "@/app/login/actions";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
+import { MobileNav } from "@/components/layout/mobile-nav";
 import { Button } from "@/components/ui/button";
 
 export default async function InternalLayout({
@@ -49,13 +50,9 @@ export default async function InternalLayout({
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* モバイル用ヘッダ */}
-        <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
+        <header className="flex items-center gap-2 border-b border-slate-200 bg-white px-4 py-3 md:hidden">
+          <MobileNav profile={profile} logoutAction={logoutAction} />
           <span className="text-sm font-semibold">M&amp;A 進捗管理</span>
-          <form action={logoutAction}>
-            <Button type="submit" variant="ghost" size="sm">
-              ログアウト
-            </Button>
-          </form>
         </header>
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>

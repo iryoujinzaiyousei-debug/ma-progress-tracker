@@ -3,23 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NAV = [
-  { href: "/dashboard", label: "ダッシュボード" },
-  { href: "/deals", label: "案件一覧" },
-  { href: "/customers", label: "顧客一覧" },
-  { href: "/deals/new", label: "新規案件" },
-];
+import { NAV_ITEMS, isNavActive } from "./nav-items";
 
 export function SidebarNav() {
   const pathname = usePathname();
 
   return (
     <nav className="flex flex-col gap-1 px-3" aria-label="メインナビゲーション">
-      {NAV.map((item) => {
-        const active =
-          item.href === "/deals"
-            ? pathname === "/deals"
-            : pathname.startsWith(item.href);
+      {NAV_ITEMS.map((item) => {
+        const active = isNavActive(pathname, item.href);
         return (
           <Link
             key={item.href}
