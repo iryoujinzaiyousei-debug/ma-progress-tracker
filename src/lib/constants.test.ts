@@ -83,8 +83,8 @@ describe("定数の整合性", () => {
     expect(isTerminalStatus("inquiry")).toBe(false);
   });
 
-  test("STATUS_ORDER は14件で全ステータスにラベルがある", () => {
-    expect(STATUS_ORDER).toHaveLength(14);
+  test("STATUS_ORDER は15件で全ステータスにラベルがある", () => {
+    expect(STATUS_ORDER).toHaveLength(15);
     for (const s of STATUS_ORDER) {
       expect(STATUS_LABEL[s]).toBeTruthy();
     }

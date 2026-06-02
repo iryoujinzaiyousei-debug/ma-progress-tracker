@@ -9,6 +9,7 @@ export type BuyerStatus = Database["public"]["Enums"]["buyer_status"];
 
 /** 進行順（カンバンの列順 / 並べ替えに使用） */
 export const STATUS_ORDER: DealStatus[] = [
+  "proposing",
   "inquiry",
   "materials_received",
   "nda",
@@ -25,7 +26,19 @@ export const STATUS_ORDER: DealStatus[] = [
   "on_hold",
 ];
 
+/** 進行ラインから外れる「分岐」ステータス（顧客共有・進捗バーのパイプライン対象外） */
+export const BRANCH_STATUSES: DealStatus[] = ["lost", "on_hold"];
+
+/**
+ * 進行パイプライン（提案中..引渡）。分岐（失注・保留）を除いた順序。
+ * 顧客共有ページ・進捗バー・進捗履歴生成で共通利用する。
+ */
+export const PIPELINE_STATUSES: DealStatus[] = STATUS_ORDER.filter(
+  (s) => !BRANCH_STATUSES.includes(s),
+);
+
 export const STATUS_LABEL: Record<DealStatus, string> = {
+  proposing: "提案中",
   inquiry: "問い合わせ",
   materials_received: "資料受領",
   nda: "秘密保持契約（NDA）",
@@ -62,6 +75,11 @@ export const STATUS_COLOR: Record<
   DealStatus,
   { badge: string; dot: string; column: string }
 > = {
+  proposing: {
+    badge: "bg-stone-100 text-stone-700 border-stone-200",
+    dot: "bg-stone-400",
+    column: "border-t-stone-300",
+  },
   inquiry: {
     badge: "bg-slate-100 text-slate-700 border-slate-200",
     dot: "bg-slate-400",

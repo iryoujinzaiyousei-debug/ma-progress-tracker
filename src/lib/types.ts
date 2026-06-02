@@ -261,6 +261,7 @@ export type Database = {
     Enums: {
       deal_type: "ma_business" | "interior" | "corporate";
       deal_status:
+        | "proposing"
         | "inquiry"
         | "materials_received"
         | "nda"

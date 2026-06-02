@@ -1,11 +1,11 @@
 import {
-  STATUS_ORDER,
+  PIPELINE_STATUSES,
   STATUS_LABEL,
   type DealStatus,
 } from "@/lib/constants";
 
-// 顧客共有ページと同じ「進行パイプライン」（分岐 lost/on_hold を除く 12 段階）
-const PIPELINE = STATUS_ORDER.slice(0, 12); // inquiry..handover
+// 顧客共有ページと同じ「進行パイプライン」（分岐 lost/on_hold を除く）
+const PIPELINE = PIPELINE_STATUSES; // 提案中..引渡
 
 /**
  * 案件の進捗を横軸で可視化するプログレスバー。

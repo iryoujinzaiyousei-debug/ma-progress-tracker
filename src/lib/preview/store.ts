@@ -8,7 +8,7 @@ import type {
   BuyerRow,
 } from "@/lib/types";
 import {
-  STATUS_ORDER,
+  PIPELINE_STATUSES,
   type DealStatus,
   type DealType,
   type DocumentCategory,
@@ -58,7 +58,7 @@ function nameOf(userId: string): string {
 
 // 進捗履歴を、現在ステータスまでの進行から生成する
 function buildHistory(dealId: string, status: DealStatus): HistoryRow[] {
-  const PIPELINE = STATUS_ORDER.slice(0, 12); // inquiry..handover
+  const PIPELINE = PIPELINE_STATUSES; // 提案中..引渡
   let path: DealStatus[];
   const idx = PIPELINE.indexOf(status);
   if (idx >= 0) {

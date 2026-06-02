@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getSharedDealByToken } from "@/lib/share";
 import {
-  STATUS_ORDER,
+  PIPELINE_STATUSES,
   STATUS_LABEL,
   STATUS_COLOR,
   DEAL_TYPE_LABEL,
@@ -12,7 +12,7 @@ import { formatYen, formatDate, formatDateTime } from "@/lib/format";
 export const dynamic = "force-dynamic";
 
 // 顧客向けに見せる進捗パイプライン（分岐 lost/on_hold を除く）
-const PIPELINE = STATUS_ORDER.slice(0, 12);
+const PIPELINE = PIPELINE_STATUSES;
 
 export default async function SharePage({
   params,

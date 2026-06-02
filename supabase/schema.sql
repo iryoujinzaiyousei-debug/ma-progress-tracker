@@ -19,6 +19,7 @@ create type deal_type as enum (
 );
 
 create type deal_status as enum (
+  'proposing',           -- 提案中
   'inquiry',             -- 問い合わせ
   'materials_received',  -- 資料受領
   'nda',                 -- 秘密保持契約（NDA）

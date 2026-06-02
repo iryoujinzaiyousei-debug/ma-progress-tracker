@@ -147,7 +147,7 @@ export default async function DashboardPage() {
             ))}
           </div>
           <p className="sr-only">
-            {STATUS_LABEL.inquiry}から{STATUS_LABEL.handover}までの件数集計
+            {STATUS_LABEL.proposing}から{STATUS_LABEL.handover}までの件数集計
           </p>
         </section>
       </div>
