@@ -4,6 +4,7 @@ import { getBuyerById } from "@/lib/buyers";
 import { getCustomerDetail } from "@/lib/customers";
 import { TypeBadge } from "@/components/deals/type-badge";
 import { DealsTable } from "@/components/deals/deals-table";
+import { BuyerDealsText } from "@/components/buyers/buyer-deals-text";
 import { BuyerStatusBadge } from "@/components/buyers/buyers-table";
 import { DeleteBuyerButton } from "@/components/buyers/delete-buyer-button";
 import { Button } from "@/components/ui/button";
@@ -137,6 +138,19 @@ export default async function BuyerDetailPage({
               <DealsTable deals={relatedDeals} />
             )}
           </Panel>
+
+          {/* 買主送付用：案件名＋共有URLのまとめテキスト */}
+          {relatedDeals.length > 0 && (
+            <Panel title="買主向け案件まとめ（コピー用）">
+              <BuyerDealsText
+                deals={relatedDeals.map((d) => ({
+                  dealName: d.deal_name,
+                  shareToken: d.share_token,
+                  shareEnabled: d.share_enabled,
+                }))}
+              />
+            </Panel>
+          )}
         </div>
 
         {/* サイド */}
