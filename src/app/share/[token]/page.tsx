@@ -6,8 +6,9 @@ import {
   STATUS_COLOR,
   DEAL_TYPE_LABEL,
   isTerminalStatus,
+  isPdfMime,
 } from "@/lib/constants";
-import { formatYen, formatDate, formatDateTime } from "@/lib/format";
+import { formatYen, formatDate, formatDateTime, formatBytes } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,7 @@ export default async function SharePage({
   const result = await getSharedDealByToken(token);
 
   if (!result) notFound();
-  const { deal, history } = result;
+  const { deal, history, summaryDocs } = result;
 
   const currentIndex = PIPELINE.indexOf(deal.current_status);
   const isBranch =
@@ -122,6 +123,54 @@ export default async function SharePage({
             </div>
           )}
         </div>
+
+        {/* 概要書 */}
+        {summaryDocs.length > 0 && (
+          <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold text-slate-800">概要書</h2>
+            <div className="space-y-6">
+              {summaryDocs.map((doc) => {
+                const pdf = isPdfMime(doc.mime_type);
+                return (
+                  <div key={doc.id}>
+                    <div className="mb-2 flex items-center gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-rose-50 text-[10px] font-bold text-rose-600">
+                        {pdf ? "PDF" : "FILE"}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-slate-800">
+                          {doc.name}
+                        </p>
+                        {doc.size_bytes != null && (
+                          <p className="text-xs text-slate-400">
+                            {formatBytes(doc.size_bytes)}
+                          </p>
+                        )}
+                      </div>
+                      {doc.preview_url && (
+                        <a
+                          href={doc.preview_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 rounded-md border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          {pdf ? "新しいタブで開く" : "ダウンロード"}
+                        </a>
+                      )}
+                    </div>
+                    {pdf && doc.preview_url && (
+                      <iframe
+                        src={doc.preview_url}
+                        title={doc.name}
+                        className="h-[70vh] w-full rounded-lg border border-slate-200"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* 金額 */}
         <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

@@ -333,6 +333,10 @@ const SAMPLE_IMAGE_URL =
       "</svg>",
   );
 
+// プレビュー用のサンプル概要書PDF（最小構成の有効なPDFの data URL）
+const SAMPLE_PDF_URL =
+  "data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqCjIgMCBvYmo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iagozIDAgb2JqPDwvVHlwZS9QYWdlL1BhcmVudCAyIDAgUi9NZWRpYUJveFswIDAgNDIwIDU5NV0vQ29udGVudHMgNCAwIFIvUmVzb3VyY2VzPDwvRm9udDw8L0YxIDUgMCBSPj4+Pj4+ZW5kb2JqCjQgMCBvYmo8PC9MZW5ndGggNjE+PnN0cmVhbQpCVCAvRjEgMjIgVGYgNjAgNTAwIFRkIChTYW1wbGUgR2FpeW91c2hvIC8gU3VtbWFyeSBQREYpIFRqIEVUCmVuZHN0cmVhbWVuZG9iago1IDAgb2JqPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj5lbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwNTIgMDAwMDAgbiAKMDAwMDAwMDEwMSAwMDAwMCBuIAowMDAwMDAwMjExIDAwMDAwIG4gCjAwMDAwMDAzMTcgMDAwMDAgbiAKdHJhaWxlcjw8L1NpemUgNi9Sb290IDEgMCBSPj4Kc3RhcnR4cmVmCjM3OAolJUVPRg==";
+
 const documents = new Map<string, DealDocument[]>();
 
 function seedDoc(
@@ -351,6 +355,16 @@ function seedDoc(
 }
 
 documents.set("d5", [
+  seedDoc("d5", {
+    category: "summary",
+    kind: "file",
+    name: "案件概要書.pdf",
+    mime_type: "application/pdf",
+    size_bytes: 12_480,
+    external_url: null,
+    preview_url: SAMPLE_PDF_URL,
+    daysAgo: 7,
+  }),
   seedDoc("d5", {
     category: "materials",
     kind: "file",
@@ -377,6 +391,16 @@ documents.set("d5", [
 
 documents.set("d6", [
   seedDoc("d6", {
+    category: "summary",
+    kind: "file",
+    name: "店舗F 概要書.pdf",
+    mime_type: "application/pdf",
+    size_bytes: 12_480,
+    external_url: null,
+    preview_url: SAMPLE_PDF_URL,
+    daysAgo: 10,
+  }),
+  seedDoc("d6", {
     category: "contract",
     kind: "link",
     name: "契約書一式（Googleドライブ）",
@@ -387,6 +411,19 @@ documents.set("d6", [
     preview_url:
       "https://drive.google.com/drive/folders/9ZyXwVuTsRqPoNmLkJiHgFeDcBa",
     daysAgo: 9,
+  }),
+]);
+
+documents.set("d8", [
+  seedDoc("d8", {
+    category: "summary",
+    kind: "file",
+    name: "飲食チェーンH 概要書.pdf",
+    mime_type: "application/pdf",
+    size_bytes: 12_480,
+    external_url: null,
+    preview_url: SAMPLE_PDF_URL,
+    daysAgo: 3,
   }),
 ]);
 

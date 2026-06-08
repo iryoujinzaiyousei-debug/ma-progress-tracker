@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getSummaryDocumentsForShare, type DealDocument } from "@/lib/documents";
 import { PREVIEW_MODE } from "@/lib/preview/flag";
 import { previewStore } from "@/lib/preview/store";
 import type { DealRow, DealStatusHistoryRow } from "@/lib/types";
@@ -31,7 +32,11 @@ export type SharedHistoryItem = Pick<
  */
 export async function getSharedDealByToken(
   token: string,
-): Promise<{ deal: SharedDeal; history: SharedHistoryItem[] } | null> {
+): Promise<{
+  deal: SharedDeal;
+  history: SharedHistoryItem[];
+  summaryDocs: DealDocument[];
+} | null> {
   if (PREVIEW_MODE) {
     const d = previewStore.getByToken(token);
     if (!d) return null;
@@ -55,7 +60,8 @@ export async function getSharedDealByToken(
         to_status: h.to_status,
         changed_at: h.changed_at,
       }));
-    return { deal, history };
+    const summaryDocs = await getSummaryDocumentsForShare(d.id);
+    return { deal, history, summaryDocs };
   }
 
   const supabase = createAdminClient();
@@ -77,6 +83,9 @@ export async function getSharedDealByToken(
     .eq("deal_id", (deal as { id: string }).id)
     .order("changed_at", { ascending: false });
 
+  const dealId = (deal as { id: string }).id;
+  const summaryDocs = await getSummaryDocumentsForShare(dealId);
+
   // share_enabled / id を取り除いて返す
   const {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -89,5 +98,6 @@ export async function getSharedDealByToken(
   return {
     deal: shared as SharedDeal,
     history: (history ?? []) as SharedHistoryItem[],
+    summaryDocs,
   };
 }
