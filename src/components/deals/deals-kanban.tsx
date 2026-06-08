@@ -43,18 +43,18 @@ function Card({ deal }: { deal: DealWithAssignees }) {
       {...attributes}
       onClick={() => router.push(`/deals/${deal.id}`)}
       className={[
-        "cursor-grab touch-none rounded-lg border bg-white p-3 shadow-sm transition active:cursor-grabbing",
+        "cursor-grab touch-none rounded-lg border bg-white px-2.5 py-2 shadow-sm transition active:cursor-grabbing",
         isDragging ? "opacity-40" : "hover:shadow-md",
         stale ? "border-yellow-300 bg-yellow-50/60" : "border-slate-200",
       ].join(" ")}
     >
-      <div className="mb-1.5 flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-medium leading-snug text-slate-900">
           {deal.deal_name}
         </p>
       </div>
       {(deal.seller_company || deal.buyer_company) && (
-        <p className="mb-1.5 truncate text-xs text-slate-500">
+        <p className="mt-0.5 truncate text-xs text-slate-500">
           <span className="text-slate-400">売</span>{" "}
           {deal.seller_company ?? "—"}
           <span className="mx-1 text-slate-300">→</span>
@@ -62,16 +62,18 @@ function Card({ deal }: { deal: DealWithAssignees }) {
           {deal.buyer_company ?? "—"}
         </p>
       )}
-      <TypeBadge type={deal.deal_type} />
-      <WarningBadges deal={deal} className="mt-2" />
-      <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+        <TypeBadge type={deal.deal_type} />
+        <WarningBadges deal={deal} />
+      </div>
+      <div className="mt-1.5 flex items-center justify-between text-xs text-slate-500">
         <span>{primary?.name ?? "未割当"}</span>
         <span className="tabular-nums">
           {formatYenShort(deal.transfer_price)}
         </span>
       </div>
       {deal.scheduled_date && (
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-0.5 text-xs text-slate-400">
           予定 {formatDate(deal.scheduled_date)}
         </p>
       )}
@@ -103,7 +105,7 @@ function Column({
       </div>
       <div
         ref={setNodeRef}
-        className={`flex min-h-24 flex-1 flex-col gap-2 rounded-lg p-1.5 transition-colors ${
+        className={`flex min-h-24 flex-1 flex-col gap-1.5 rounded-lg p-1.5 transition-colors ${
           isOver ? "bg-slate-200/70" : "bg-slate-100/60"
         }`}
       >
