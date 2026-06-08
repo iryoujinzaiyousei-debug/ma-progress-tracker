@@ -94,7 +94,7 @@ function Column({
   return (
     <div className="flex w-72 shrink-0 flex-col">
       <div
-        className={`mb-2 flex items-center justify-between rounded-md border-t-2 bg-white px-3 py-2 shadow-sm ${c.column}`}
+        className={`sticky top-0 z-10 mb-2 flex items-center justify-between rounded-md border-t-2 bg-white px-3 py-2 shadow-sm ${c.column}`}
       >
         <span className="text-sm font-semibold text-slate-700">
           {STATUS_LABEL[status]}
@@ -179,7 +179,7 @@ export function DealsKanban({
       onDragStart={handleStart}
       onDragEnd={handleEnd}
     >
-      <div className="flex gap-3 overflow-x-auto pb-4">
+      <div className="flex max-h-[calc(100dvh-12rem)] gap-3 overflow-auto pb-4">
         {STATUS_ORDER.map((status) => (
           <Column
             key={status}
